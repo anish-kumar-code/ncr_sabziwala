@@ -1,40 +1,50 @@
-// import { Input, Modal } from 'antd'
-// import React, { useState } from 'react'
-// import OrderTable from './components/OrderTable'
-
-// function Order() {
-//     const [searchText, setSearchText] = useState('');
-
-//     return (
-//         <>
-//             <div className='lg:px-10 px-5 my-8 md:flex items-center gap-4 justify-between '>
-//                 <Input.Search
-//                     placeholder="Search by name"
-//                     onChange={(e) => setSearchText(e.target.value)}
-//                     style={{
-//                         maxWidth: 300,
-//                         borderRadius: '6px'
-//                     }}
-//                     size="large"
-//                 />
-//             </div>
-//             <OrderTable searchText={searchText} />
-//         </>
-//     )
-// }
-
-// export default Order
-
-
-import { Input, Tabs } from 'antd';
-import React, { useState } from 'react';
+import { Input, message, Tabs, Badge } from 'antd';
+import React, { useEffect, useState } from 'react';
 import OrderTable from './components/OrderTable';
-
-const { TabPane } = Tabs;
+import { getAllOrdersCount } from '../../../services/admin/apiOrder';
 
 function Order() {
     const [searchText, setSearchText] = useState('');
-    const [orderType, setOrderType] = useState('ready'); // default tab
+    const [orderCounts, setOrderCounts] = useState({});
+    const [orderType, setOrderType] = useState('pending');
+
+    useEffect(() => {
+        fetchOrderCounts();
+    }, []);
+
+    const fetchOrderCounts = async () => {
+        try {
+            const res = await getAllOrdersCount();
+            setOrderCounts(res.counts || {});
+        } catch (error) {
+            message.error("Error fetching order count");
+        }
+    };
+
+    const tabWithCount = (label, key) => ({
+        label: (
+            <span>
+                {label}{' '}
+                <Badge
+                    count={orderCounts?.[key] || 0}
+                    showZero
+                    style={{ backgroundColor: '#1890ff' }}
+                />
+            </span>
+        ),
+        key
+    });
+
+    const tabs = [
+        tabWithCount('Pending Orders', 'pending'),
+        tabWithCount('Accepted Orders', 'accepted'),
+        tabWithCount('Ready Orders', 'ready'),
+        tabWithCount('Assigned Orders', 'shipped'),
+        tabWithCount('Running Orders', 'out_for_delivery'),
+        tabWithCount('Delivered Orders', 'delivered'),
+        tabWithCount('Cancel Orders', 'cancelled'),
+        tabWithCount('All Orders', 'all'),
+    ];
 
     return (
         <>
@@ -43,24 +53,17 @@ function Order() {
                     <Input.Search
                         placeholder="Search by name"
                         onChange={(e) => setSearchText(e.target.value)}
-                        style={{
-                            maxWidth: 300,
-                            borderRadius: '6px'
-                        }}
+                        style={{ maxWidth: 300, borderRadius: '6px' }}
                         size="large"
                     />
                 </div>
 
                 <Tabs
-                    defaultActiveKey="running"
-                    onChange={(key) => setOrderType(key)}
+                    items={tabs}
+                    activeKey={orderType}
+                    onChange={setOrderType}
                     className="mt-6"
-                >
-                    <TabPane tab="Ready Orders" key="ready" />
-                    <TabPane tab="Assigned Orders" key="shipped" />
-                    <TabPane tab="Running Orders" key="running" />
-                    <TabPane tab="All Orders" key="all" />
-                </Tabs>
+                />
             </div>
 
             <OrderTable searchText={searchText} type={orderType} />

@@ -12,7 +12,7 @@ import { FaClipboardList, FaRegUser, FaSitemap, FaUserClock } from 'react-icons/
 import { IoFastFoodOutline, IoImagesOutline, IoSettingsOutline, IoStorefront } from 'react-icons/io5'
 import { GiTakeMyMoney } from "react-icons/gi";
 import { FaArrowRightToBracket } from 'react-icons/fa6'
-import { RiCoupon3Line } from "react-icons/ri";
+import { RiCoupon3Line, RiMastercardLine } from "react-icons/ri";
 import { RiEBike2Fill } from "react-icons/ri";
 import { useAuth } from '../context/AuthContext'
 
@@ -40,15 +40,23 @@ const AdminSidebar = ({ collapsed, settingData }) => {
         { type: 'divider' },
         { key: 'dashboard', icon: <LuLayoutDashboard size={18} />, label: 'Dashboard', onClick: () => navigate('/admin') },
         { key: 'banner', icon: <IoImagesOutline size={18} />, label: 'Banner', onClick: () => navigate('/admin/banner') },
-        { key: 'category', icon: <TbCategory2 size={18} />, label: 'Category', onClick: () => navigate('/admin/category') },
-        { key: 'sub-category', icon: <MdOutlineCategory size={18} />, label: 'Sub Category', onClick: () => navigate('/admin/sub-category') },
-        // { key: 'product', icon: <IoFastFoodOutline size={18} />, label: 'Product', onClick: () => navigate('/admin/product') },
+
+
+        {
+            key: 'master', icon: <RiMastercardLine size={18} />, label: 'Master', children: [
+                { key: 'category', icon: <TbCategory2 size={18} />, label: 'Category', onClick: () => navigate('/admin/category') },
+                { key: 'sub-category', icon: <MdOutlineCategory size={18} />, label: 'Sub Category', onClick: () => navigate('/admin/sub-category') },
+                { key: 'product', icon: <IoFastFoodOutline size={18} />, label: 'Product', onClick: () => navigate('/admin/product') },
+            ]
+        },
+
+
         // { key: 'product-flags', icon: <IoFastFoodOutline size={18} />, label: 'Product Flag', onClick: () => navigate('/admin/product-flags') },
         // { key: 'store199', icon: <IoFastFoodOutline size={18} />, label: 'Store 199', onClick: () => navigate('/admin/store199') },
         // { key: 'vendor', icon: <LuUsers size={18} />, label: 'Vendor', onClick: () => navigate('/admin/vendor') },
         // { key: 'shop', icon: <IoStorefront size={18} />, label: 'Shop', onClick: () => navigate('/admin/shop') },
-        // { key: 'order', icon: <FaClipboardList size={18} />, label: 'Order', onClick: () => navigate('/admin/order') },
-        // { key: 'coupon', icon: <RiCoupon3Line size={18} />, label: 'Coupon', onClick: () => navigate('/admin/coupon') },
+        { key: 'order', icon: <FaClipboardList size={18} />, label: 'Order', onClick: () => navigate('/admin/order') },
+
         // { key: 'driver', icon: <RiEBike2Fill size={18} />, label: 'Driver', onClick: () => navigate('/admin/driver') },
         // { key: 'explore', icon: <SiNextra size={18} />, label: 'Explore', onClick: () => navigate('/admin/explore') },
 
@@ -69,16 +77,8 @@ const AdminSidebar = ({ collapsed, settingData }) => {
         { key: 'user', icon: <FaRegUser size={18} />, label: 'User', onClick: () => navigate('/admin/user') },
         {
             key: 'settings', icon: <IoSettingsOutline size={18} />, label: 'Settings', children: [
-                // { key: 'settings-profile', label: 'Profile', onClick: () => navigate('/admin/settings/profile') },
                 { key: 'settings-charges', icon: <FaSitemap />, label: 'Site', onClick: () => navigate('/admin/settings/charges') },
-                // {
-                //     key: 'vendor-cms', icon: <FaUserClock size={18} />, label: 'Vendor CMS', children: [
-                //         { key: 'vendor-terms-and-conditions', label: 'Terms & Conditions', onClick: () => navigate('/admin/terms-and-conditions/vendor') },
-                //         { key: 'vendor-privacy-policy', label: 'Privacy Policy', onClick: () => navigate('/admin/privacy-policy/vendor') },
-                //         { key: 'vendor-refund-policy', label: 'Refund Policy', onClick: () => navigate('/admin/refund-policy/vendor') },
-                //         { key: 'vendor-about-us', label: 'About Us', onClick: () => navigate('/admin/about-us/vendor') }
-                //     ]
-                // },
+                { key: 'coupon', icon: <RiCoupon3Line size={18} />, label: 'Coupon', onClick: () => navigate('/admin/coupon') },
                 {
                     key: 'user-cms', icon: <FaUserClock size={18} />, label: 'User CMS', children: [
                         { key: 'user-terms-and-conditions', label: 'Terms & Conditions', onClick: () => navigate('/admin/terms-and-conditions/user') },

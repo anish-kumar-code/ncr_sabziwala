@@ -1,5 +1,4 @@
 const cart = require("../../../models/cart");
-require("../../../models/toppins");
 
 exports.getCart = async (req, res) => {
     try {

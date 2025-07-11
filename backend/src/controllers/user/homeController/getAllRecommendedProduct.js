@@ -1,6 +1,5 @@
 const Category = require("../../../models/category");
 const User = require("../../../models/user");
-const VendorProduct = require("../../../models/vendorProduct");
 const catchAsync = require("../../../utils/catchAsync");
 
 exports.getAllRecommendedProduct = catchAsync(async (req, res, next) => {

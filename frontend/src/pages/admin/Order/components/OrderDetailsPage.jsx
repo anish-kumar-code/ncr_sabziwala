@@ -14,7 +14,8 @@ import {
     Col
 } from 'antd';
 import { useParams } from 'react-router';
-import { getOrderDetails, getAllDrivers, assignDriver } from '../../../../services/admin/apiOrder';
+import { getOrderDetails, getAllDrivers, assignDriver, downloadInvoice } from '../../../../services/admin/apiOrder';
+import { DownloadOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -33,8 +34,8 @@ const OrderDetailsPage = () => {
             try {
                 const response = await getOrderDetails(id);
                 setOrder(response.order);
-                const driverResponse = await getAllDrivers(id);
-                setDrivers(driverResponse.data || []);
+                // const driverResponse = await getAllDrivers(id);
+                // setDrivers(driverResponse.data || []);
             } catch (error) {
                 message.error('Failed to load data.');
             } finally {
@@ -77,8 +78,14 @@ const OrderDetailsPage = () => {
     const productColumns = [
         {
             title: 'Product',
-            dataIndex: ['productId', 'name'],
-            key: 'productName',
+            key: 'product',
+            render: (_, record) =>
+                `${record.productId?.name || 'N/A'} - ${record.name?.split(' - ')[1] || ''}`
+        },
+        {
+            title: 'Unit',
+            dataIndex: 'unit',
+            key: 'unit'
         },
         {
             title: 'Qty',
@@ -92,11 +99,16 @@ const OrderDetailsPage = () => {
             render: value => `₹${value}`,
         },
         {
-            title: 'Toppings',
-            dataIndex: 'toppings',
-            key: 'toppings',
-            render: (toppings) =>
-                toppings?.length ? `+ ₹${toppings.reduce((sum, t) => sum + t.price, 0)}` : '—',
+            title: 'Original Price',
+            dataIndex: 'originalPrice',
+            key: 'originalPrice',
+            render: value => value ? `₹${value}` : '—',
+        },
+        {
+            title: 'Discount (%)',
+            dataIndex: 'discount',
+            key: 'discount',
+            render: value => `${value}%`
         },
         {
             title: 'Final',
@@ -106,17 +118,28 @@ const OrderDetailsPage = () => {
         },
     ];
 
+    const handleInvoiceDownload = async (orderId) => {
+        try {
+            await downloadInvoice(orderId)
+        } catch (error) {
+            message.error("Error in invoice download")
+        }
+    }
+
     return (
         <div style={{ padding: '24px' }}>
-            <Title level={3}>Order Details</Title>
+            <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+                <Title level={3} style={{ margin: 0 }}>Order Details</Title>
+                <Button type="primary" icon={<DownloadOutlined />} onClick={() => handleInvoiceDownload(orderId)}>
+                    Download Invoice
+                </Button>
+            </Row>
 
             <Row gutter={[16, 16]}>
                 <Col xs={24} lg={16}>
                     <Card size="small">
                         <Descriptions column={2} size="small" bordered>
-                            <Descriptions.Item label="Booking ID">{order.booking_id}</Descriptions.Item>
-                            <Descriptions.Item label="Shop">{order.shopId?.name}</Descriptions.Item>
-                            <Descriptions.Item label="Vendor">{order.vendorId?.name}</Descriptions.Item>
+                            <Descriptions.Item label="Order ID">{order.orderId}</Descriptions.Item>
                             <Descriptions.Item label="User">{order.userId?.name} ({order.userId?.email})</Descriptions.Item>
                             <Descriptions.Item label="Delivery Time">
                                 {new Date(order.deliveryDate).toLocaleDateString()} at {order.deliveryTime}
@@ -129,7 +152,7 @@ const OrderDetailsPage = () => {
                             </Descriptions.Item>
                         </Descriptions>
 
-                        {!order.assignedDriver && (
+                        {order.orderStatus == "ready" && !order.assignedDriver && (
                             <Space style={{ marginTop: 16 }}>
                                 <Select
                                     style={{ width: 250 }}
@@ -154,36 +177,14 @@ const OrderDetailsPage = () => {
                         )}
                     </Card>
 
-                    {/* <Card title="Delivery Address" size="small" style={{ marginTop: 16 }}>
-                        <Text strong>{order.addressId?.name}</Text>
-                        <div>{order.addressId?.address1}</div>
-                        <div>{order.addressId?.address2}</div>
-                        <div>{order.addressId?.city}, {order.addressId?.state} - {order.addressId?.pincode}</div>
-                    </Card> */}
-                    <Card
-                        title="Delivery Address"
-                        size="small"
-                        style={{ marginTop: 16 }}
-                    // extra={
-                    //     order.addressId?.location?.coordinates && (
-                    //         <Button
-                    //             type="link"
-                    //             target="_blank"
-                    //             href={`https://www.google.com/maps?q=${order.addressId.location.coordinates[1]},${order.addressId.location.coordinates[0]}`}
-                    //         >
-                    //             Navigate
-                    //         </Button>
-                    //     )
-                    // }
-                    >
-                        <Text strong>{order.addressId?.name}</Text>
-                        <div>{order.addressId?.address1}</div>
-                        <div>{order.addressId?.address2}</div>
+                    <Card title="Delivery Address" size="small" style={{ marginTop: 16 }}>
+                        <Text strong>{order.deliveryAddressId?.name}</Text>
+                        <div>{order.deliveryAddressId?.address1}</div>
+                        <div>{order.deliveryAddressId?.address2}</div>
                         <div>
-                            {order.addressId?.city}, {order.addressId?.state} - {order.addressId?.pincode}
+                            {order.deliveryAddressId?.city}, {order.deliveryAddressId?.state} - {order.deliveryAddressId?.pincode}
                         </div>
                     </Card>
-
                 </Col>
 
                 <Col xs={24} lg={8}>
@@ -192,8 +193,8 @@ const OrderDetailsPage = () => {
                             <Descriptions.Item label="Item Total">₹{order.itemTotal}</Descriptions.Item>
                             <Descriptions.Item label="Packing Charge">₹{order.packingCharge}</Descriptions.Item>
                             <Descriptions.Item label="Delivery Charge">₹{order.deliveryCharge}</Descriptions.Item>
-                            <Descriptions.Item label="Coupon Discount">₹{order.couponAmount}</Descriptions.Item>
-                            <Descriptions.Item label="Final Total">₹{order.finalTotalPrice}</Descriptions.Item>
+                            <Descriptions.Item label="Coupon Discount">₹{order.couponDiscount}</Descriptions.Item>
+                            <Descriptions.Item label="Final Total">₹{order.finalAmount}</Descriptions.Item>
                         </Descriptions>
                     </Card>
                 </Col>
@@ -201,7 +202,7 @@ const OrderDetailsPage = () => {
 
             <Card title="Products" size="small" style={{ marginTop: 24 }}>
                 <Table
-                    dataSource={order.productData}
+                    dataSource={order.items}
                     columns={productColumns}
                     pagination={false}
                     rowKey={(record, index) => index}

@@ -1,7 +1,6 @@
 
 const { v4: uuidv4 } = require('uuid');
 const newCart = require('../../../models/newCart');
-const Shop = require('../../../models/shop');
 const newOrder = require('../../../models/newOrder');
 const User = require('../../../models/user');
 const Address = require('../../../models/address');

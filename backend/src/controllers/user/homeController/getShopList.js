@@ -1,7 +1,5 @@
 const Setting = require("../../../models/settings");
-const Shop = require("../../../models/shop");
 const User = require("../../../models/user");
-const VendorProduct = require("../../../models/vendorProduct");
 const catchAsync = require("../../../utils/catchAsync");
 const { FOOD_SERVICE_ID, MART_SERVICE_ID } = require("../../../utils/constants");
 const getDistanceAndTime = require("../../../utils/getDistanceAndTime");

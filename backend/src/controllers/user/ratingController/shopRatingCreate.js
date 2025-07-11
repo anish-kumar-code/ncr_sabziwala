@@ -1,5 +1,4 @@
-const Shop = require("../../../models/shop");
-const shopRating = require("../../../models/shopRating");
+
 
 
 // POST /api/shop-ratings

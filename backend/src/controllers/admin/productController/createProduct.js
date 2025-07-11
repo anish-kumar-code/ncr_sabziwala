@@ -2,62 +2,84 @@ const Product = require("../../../models/product");
 const AppError = require("../../../utils/AppError");
 const catchAsync = require("../../../utils/catchAsync");
 
-const validateRequiredField = (field, fieldName) => {
-    if (!field || !field.trim()) return new AppError(`${fieldName} is required.`, 400);
-    return null;
-};
+// const validateRequiredField = (field, fieldName) => {
+//     if (!field || (typeof field === 'string' && !field.trim())) {
+//         return new AppError(`${fieldName} is required.`, 400);
+//     }
+//     return null;
+// };
 
 exports.createProduct = catchAsync(async (req, res, next) => {
-    let { name, categoryId, subCategoryId, sku, mrp, sellingPrice, discount, unitOfMeasurement, sellingUnit, shortDescription, longDescription, serviceId, type } = req.body;
+    const {
+        title,
+        description,
+        categoryId,
+        subCategoryId,
+        tags,
+        isDealOfTheDay,
+        isAvailable,
+        isReturnAvailable,
+        isFavorite,
+        details = {},
+        info = {}
+    } = req.body;
 
-    const requiredFields = [
-        { field: name, name: "Product name" },
-        { field: categoryId, name: "Category ID" },
-        { field: mrp, name: "MRP" },
-        { field: sellingPrice, name: "Selling price" },
-        { field: unitOfMeasurement, name: "Unit of measurement" },
-        { field: sellingUnit, name: "Selling unit" },
-        { field: shortDescription, name: "Short Description" },
-        { field: longDescription, name: "Long Description" },
-        { field: serviceId, name: "Service Type" },
-    ];
+    // Parse JSON strings if sent via multipart/form-data
+    const parsedDetails = typeof details === 'string' ? JSON.parse(details) : details;
+    const parsedInfo = typeof info === 'string' ? JSON.parse(info) : info;
 
-    for (const { field, name } of requiredFields) {
-        const error = validateRequiredField(field, name);
-        if (error) return next(error);
+    // Validate required fields
+    // const requiredFields = [
+    //     { field: title, name: "Title" },
+    //     { field: category, name: "Category ID" }
+    // ];
+    // for (const { field, name } of requiredFields) {
+    //     const error = validateRequiredField(field, name);
+    //     if (error) return next(error);
+    // }
+
+    // Handle product-level images
+    let imageUrls = [];
+    if (req.files && req.files.images) {
+        imageUrls = req.files.images.map((file) => `${file.destination}/${file.filename}`);
     }
 
-    // let skuProduct = await Product.findOne({ sku });
-    // if (skuProduct) return next(new AppError("SKU is already exists. Plz enter different SKU No.", 400));
-
-    let galleryimagePaths;
-    if (req.files && req.files.gallery_image) {
-        const imagesUrls = req.files.gallery_image.map((file) => {
-            return `${file.destination}/${file.filename}`;
-        });
-        galleryimagePaths = imagesUrls;
-    }
-
-    // primary_image
-    let primaryImage;
-    if (req.files && req.files.primary_image) {
-        const url = `${req.files.primary_image[0].destination}/${req.files.primary_image[0].filename}`;
-        primaryImage = url;
-    } else {
-        primaryImage = ""
-    }
-
-
-    let product = new Product({
-        name, categoryId, subCategoryId, sku, primary_image: primaryImage, gallery_image: galleryimagePaths, mrp, sellingPrice, discount: discount || "", unitOfMeasurement, sellingUnit, shortDescription, longDescription, serviceId, type
+    // Create Product (without variants)
+    const product = new Product({
+        name: title,
+        description,
+        images: imageUrls,
+        categoryId,
+        subCategoryId,
+        tags: tags || [],
+        isDealOfTheDay: isDealOfTheDay || false,
+        isAvailable: isAvailable !== undefined ? isAvailable : true,
+        isReturnAvailable: isReturnAvailable || false,
+        isFavorite: isFavorite || false,
+        details: {
+            nutrientValue: parsedDetails.nutrientValue || '',
+            about: parsedDetails.about || '',
+            description: parsedDetails.description || ''
+        },
+        info: {
+            shelfLife: parsedInfo.shelfLife || '',
+            returnPolicy: parsedInfo.returnPolicy || '',
+            storageTips: parsedInfo.storageTips || '',
+            country: parsedInfo.country || '',
+            help: parsedInfo.help || '',
+            disclaimer: parsedInfo.disclaimer || '',
+            seller: parsedInfo.seller || '',
+            fssai: parsedInfo.fssai || ''
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
     });
 
     await product.save();
 
     return res.status(201).json({
         status: true,
-        message: "Product added successfully.",
-        data: { product },
-        newProduct: true,
+        message: "Product created successfully. You can now add variants.",
+        data: { product }
     });
 });

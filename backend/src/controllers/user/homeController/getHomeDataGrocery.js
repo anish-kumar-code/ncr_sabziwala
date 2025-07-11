@@ -2,7 +2,6 @@ const banner = require("../../../models/banner");
 const Category = require("../../../models/category");
 const Explore = require("../../../models/explore");
 const User = require("../../../models/user");
-const VendorProduct = require("../../../models/vendorProduct");
 const { calculateOffer } = require("../../../utils/calculateOffer");
 const catchAsync = require("../../../utils/catchAsync");
 const { MART_SERVICE_ID } = require("../../../utils/constants");

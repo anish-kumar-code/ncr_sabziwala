@@ -1,7 +1,6 @@
 const Category = require("../../../models/category");
 const Setting = require("../../../models/settings");
 const User = require("../../../models/user");
-const VendorProduct = require("../../../models/vendorProduct");
 const catchAsync = require("../../../utils/catchAsync");
 const getDistanceAndTime = require("../../../utils/getDistanceAndTime"); // Import the utility
 

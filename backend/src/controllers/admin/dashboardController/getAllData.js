@@ -5,8 +5,6 @@ const newOrder = require("../../../models/newOrder");
 const Product = require("../../../models/product");
 const Service = require("../../../models/service");
 const User = require("../../../models/user");
-const Vendor = require("../../../models/vendor");
-const VendorProduct = require("../../../models/vendorProduct");
 const catchAsync = require("../../../utils/catchAsync");
 
 exports.getAllData = catchAsync(async (req, res, next) => {
@@ -14,18 +12,9 @@ exports.getAllData = catchAsync(async (req, res, next) => {
 
         const categories = await Category.find({ cat_id: null }).populate({ path: "serviceId", select: "name" });
 
-        // let categoryWithProduct = [];
-        // for (let category of categories) {
-        //     const count = await Product.countDocuments({ categoryId: category._id })
-        //     categoryWithProduct.push({ ...category._doc, productCount: count })
-        // }
 
         const subCategories = await Category.find({ cat_id: { $ne: null } });
-        // let subCategoryWithProduct = [];
-        // for (let subCategory of subCategories) {
-        //     const count = await Product.countDocuments({ subCategoryId: subCategory._id })
-        //     subCategoryWithProduct.push({ ...subCategory._doc, productCount: count })
-        // }
+
 
         const services = await Service.find();
         const productCount = [];
@@ -33,8 +22,6 @@ exports.getAllData = catchAsync(async (req, res, next) => {
             const count = await Product.countDocuments({ serviceId: service._id })
             productCount.push({ name: service.name, productCount: count })
         }
-
-        const vendorCount = await Vendor.countDocuments()
 
         const bannerCount = await banner.countDocuments();
         const driverCount = await Driver.countDocuments();
@@ -47,7 +34,7 @@ exports.getAllData = catchAsync(async (req, res, next) => {
             subCategory: subCategories.length,
             food: productCount[0].productCount,
             grocery: productCount[1].productCount,
-            vendor: vendorCount,
+            vendor: 10,
             driver: driverCount || 10,
             user: userCount || 10,
             order: orderCount || 10

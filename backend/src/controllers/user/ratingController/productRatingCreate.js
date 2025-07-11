@@ -1,6 +1,5 @@
 const Driver = require("../../../models/driver");
 const productRating = require("../../../models/productRating");
-const VendorProduct = require("../../../models/vendorProduct");
 
 
 // POST /api/driver-ratings

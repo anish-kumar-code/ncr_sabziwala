@@ -16,7 +16,6 @@ const { getProductOfShop } = require("../controllers/user/homeController/getProd
 const { getProductDetail } = require("../controllers/user/homeController/getProductDetail");
 const { createCart } = require("../controllers/user/cartController/createCart");
 const { getCart } = require("../controllers/user/cartController/getCart");
-const createOrder = require("../controllers/user/orderController/createOrder");
 const getOrderDetail = require("../controllers/user/orderController/getOrderDetail");
 const getAllOrder = require("../controllers/user/orderController/getAllOrder");
 const { getAllBanners } = require("../controllers/user/bannerController/getBanner");
@@ -66,6 +65,7 @@ const { deleteUser2 } = require("../controllers/user/authController/deleteUser2"
 const { shopRatingCreate } = require("../controllers/user/ratingController/shopRatingCreate");
 const { driverRatingCreate } = require("../controllers/user/ratingController/driverRatingCreate");
 const { productRatingCreate } = require("../controllers/user/ratingController/productRatingCreate");
+const { createOrder } = require("../controllers/user/orderController/createOrder");
 const router = express.Router()
 
 // router.get("/test", (req,res)=>{

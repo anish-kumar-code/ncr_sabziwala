@@ -1,7 +1,5 @@
 const Explore = require("../../../models/explore");
 const exploreSection = require("../../../models/exploreSection");
-const store199Product = require("../../../models/store199Product");
-const VendorProduct = require("../../../models/vendorProduct");
 const AppError = require("../../../utils/AppError");
 const { calculateOffer } = require("../../../utils/calculateOffer");
 const catchAsync = require("../../../utils/catchAsync");

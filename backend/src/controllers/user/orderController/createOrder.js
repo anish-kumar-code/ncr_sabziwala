@@ -1,93 +1,105 @@
-const VendorProduct = require("../../../models/vendorProduct");
+
 const Order = require("../../../models/order");
+const Product = require('../../../models/product');
+const ProductVariant = require('../../../models/productVarient');
+const Address = require('../../../models/address');
 
-// let bookingCounter = 3; // Persist in DB in production
-
-const createOrder = async (req, res) => {
+exports.createOrder = async (req, res) => {
     try {
         const {
-            productData: prod,
-            addressId,
+            items, // array of { productId, variantId, quantity }
+            deliveryAddressId,
             deliveryDate,
             deliveryTime,
-            couponId = null,
-            couponCode = "",
-            couponAmount = 0,
-            deliveryCharge,
-            finalTotalPrice,
             paymentMode,
-            razorpayOrderId = null
+            couponCode = null,
+            deliveryCharge = 0,
+            packingCharge = 0
         } = req.body;
-
-        console.log('Request body:', req.body);
 
         const userId = req.user._id;
 
-        // Generate unique booking ID (e.g., ORD-001)
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ message: "Items are required" });
+        }
+
+        const orderItems = [];
+        let itemTotal = 0;
+
+        for (const item of items) {
+            const variant = await ProductVariant.findById(item.variantId);
+            if (!variant || variant.status !== 'active') {
+                return res.status(400).json({ message: `Variant not found or inactive: ${item.variantId}` });
+            }
+
+            const product = await Product.findById(item.productId);
+            if (!product || product.status !== 'active') {
+                return res.status(400).json({ message: `Product not found or inactive: ${item.productId}` });
+            }
+
+            const price = variant.price;
+            const originalPrice = variant.originalPrice || price;
+            const discount = variant.discount || 0;
+            const quantity = item.quantity || 1;
+
+            const finalPrice = price * quantity;
+
+            itemTotal += finalPrice;
+
+            orderItems.push({
+                productId: item.productId,
+                variantId: item.variantId,
+                name: product.name + ' - ' + variant.name,
+                unit: variant.unit,
+                price,
+                quantity,
+                originalPrice,
+                discount,
+                finalPrice
+            });
+        }
+
+        let couponDiscount = 0;
+
+        // Optional: apply coupon logic
+        // if (couponCode) {
+        //     const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
+        //     if (coupon) {
+        //         couponDiscount = ...;
+        //     }
+        // }
+
+        const finalAmount = itemTotal + deliveryCharge + packingCharge - couponDiscount;
+
         const orderCount = await Order.countDocuments();
         const booking_id = `ORD-${String(orderCount + 1).padStart(3, '0')}`;
 
-        // Fetch vendorProduct to derive shop and vendor
-        const productDetails = await VendorProduct.findById(prod.product_id)
-            .populate('shopId')
-            .populate('vendorId');
-
-        if (!productDetails || !productDetails.shopId || !productDetails.vendorId) {
-            return res.status(400).json({ error: 'Invalid product/shop/vendor information' });
-        }
-
-        const shopId = productDetails.shopId._id;
-        const vendorId = productDetails.vendorId._id;
-        const packingCharge = productDetails.shopId.packingCharge || 0;
-        // const deliveryCharge = 10; // Can be dynamic
-
-        // Commission calculation
-        const commissionRate = productDetails.commissionRate || 0;
-        const commissionAmount = (prod.price * prod.quantity * commissionRate) / 100;
-
-        // Totals
-        const prodTotal = Math.round(prod.finalPrice);
-        const afterCouponAmount = Math.round(prodTotal - couponAmount);
-        // const finalTotalPrice = Math.round(afterCouponAmount + packingCharge);
-        // const finalTotalPrice = Math.round(afterCouponAmount + deliveryCharge + packingCharge);
-        // const finalTotalPrice = prod.finalPrice || Math.round(afterCouponAmount + deliveryCharge + packingCharge);
-        // console.log('Final Total Price:', prod.finalPrice);
-
-        // Build and save order document
-        const order = new Order({
-            booking_id,
-            shopId,
-            vendorId,
-            productData: prod,
-            itemTotal: prodTotal,
-            couponId,
-            couponCode,
-            couponAmount,
-            afterCouponAmount,
+        const newOrder = new Order({
+            orderId: booking_id,
             userId,
-            addressId,
-            shopId,
-            vendorId,
+            items: orderItems,
+            itemTotal,
+            couponCode,
+            couponDiscount,
+            deliveryCharge,
+            packingCharge,
+            finalAmount,
+            deliveryAddressId,
             deliveryDate,
             deliveryTime,
-            deliveryCharge: Math.round(deliveryCharge),
-            packingCharge,
-            commissionRate,
-            commissionAmount,
-            finalTotalPrice,
-            orderStatus: 'pending',
             paymentMode,
-            paymentStatus: paymentMode === 'online' ? 'paid' : 'pending',
-            paymentId: paymentMode === 'online' ? razorpayOrderId : null,
-            razorpayOrderId: paymentMode === 'online' ? razorpayOrderId : null,
+            paymentStatus: paymentMode === 'cod' || paymentMode === 'cash' ? 'pending' : 'paid'
         });
 
-        await order.save();
-        return res.status(201).json({ success: true, order });
+        await newOrder.save();
+
+        return res.status(201).json({
+            message: 'Order created successfully',
+            order: newOrder
+        });
+
     } catch (error) {
-        console.error('Error creating order:', error);
-        return res.status(500).json({ success: false, message: 'Server Error', error: error.message });
+        console.error('Create Order Error:', error);
+        return res.status(500).json({ message: 'Something went wrong', error: error.message });
     }
 };
-
-module.exports = createOrder;

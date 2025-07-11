@@ -33,9 +33,9 @@ const OrderTable = ({ searchText, onDelete, type }) => {
 
     const columns = [
         {
-            title: 'Booking ID',
-            dataIndex: 'booking_id',
-            key: 'booking_id',
+            title: 'Order ID',
+            dataIndex: 'orderId',
+            key: 'orderId',
             align: 'center',
         },
         {
@@ -53,8 +53,8 @@ const OrderTable = ({ searchText, onDelete, type }) => {
         },
         {
             title: 'Total Amount',
-            dataIndex: 'finalTotalPrice',
-            key: 'finalTotalPrice',
+            dataIndex: 'finalAmount',
+            key: 'finalAmount',
             align: 'center',
             render: (amount) => `₹${amount}`,
         },
@@ -139,7 +139,7 @@ const OrderTable = ({ searchText, onDelete, type }) => {
     return (
         <Table
             dataSource={orders.filter((item) =>
-                item.booking_id.toLowerCase().includes(searchText.toLowerCase())
+                item.orderId.toLowerCase().includes(searchText.toLowerCase())
             )}
             columns={columns}
             rowKey="_id"

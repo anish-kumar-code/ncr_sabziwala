@@ -1,5 +1,4 @@
 const { default: mongoose } = require("mongoose");
-const Shop = require("../models/shop");
 
 
 /**
