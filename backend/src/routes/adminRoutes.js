@@ -59,10 +59,6 @@ const { getAllDriverForThisOrder } = require("../controllers/admin/orderControll
 const { toggleBlockStatus } = require("../controllers/admin/driverController/toggleBlockStatus");
 const { assignProductToExploreSection } = require("../controllers/admin/exploreSectionController/assignProductToExploreSection");
 const { settleDriverWallet } = require("../controllers/admin/walletController/settleDriverWallert");
-const { getAllNewOrder } = require("../controllers/admin/neworderController/getAllNewOrder");
-const { getNewOrder } = require("../controllers/admin/neworderController/getNewOrder");
-const { getAllDriverForThisNewOrder } = require("../controllers/admin/neworderController/getAllDriverForThisNewOrder");
-const { assignNewDriver } = require("../controllers/admin/neworderController/assignNewDriver");
 const { createServiceabelAreas } = require("../controllers/admin/serviceableAreasController/createServiceableAreas");
 const { getServiceableAreas } = require("../controllers/admin/serviceableAreasController/getServiceableAreas");
 const { updateServiceableAreas } = require("../controllers/admin/serviceableAreasController/updateServiceableAreas");
@@ -74,6 +70,8 @@ const { editProductVarient } = require("../controllers/admin/productVarientContr
 const { deleteProductVarientImage } = require("../controllers/admin/productVarientController/deleteProductVarientImage");
 const getAllOrdersCount = require("../controllers/admin/orderController/getAllOrdersCount");
 const orderInvoice = require("../controllers/admin/orderController/orderInvoice");
+const { getRecentTransactions } = require("../controllers/admin/dashboardController/getRecentTransactions");
+const { getNewUsers } = require("../controllers/admin/dashboardController/getNewUsers");
 const router = express.Router()
 
 router.get("/test/admin", (req, res) => {
@@ -88,6 +86,8 @@ router.get("/test/admin", (req, res) => {
 router.post('/signup', signup)
 router.post('/login', login)
 router.get("/dashboard", adminAuthenticate, getAllData)
+router.get("/recent-transactions", getRecentTransactions)
+router.get("/new-users", getNewUsers)
 
 
 
@@ -225,16 +225,6 @@ router.patch("/order/assign/:orderId", adminAuthenticate, assignedDriver)
 //------------------------------------------------
 router.get('/invoice/:orderId', orderInvoice);
 
-
-
-//------------------------------------------------
-// new order
-//------------------------------------------------
-// router.get("/neworder", adminAuthenticate, getAllNewOrder)
-// router.patch("/neworder/status/:orderId", adminAuthenticate, orderComplete)
-// router.get("/neworder/:orderId", adminAuthenticate, getNewOrder)
-// router.get("/neworder/:orderId/driverlist", adminAuthenticate, getAllDriverForThisNewOrder)
-// router.patch("/neworder/assign/:orderId", adminAuthenticate, assignNewDriver)
 
 
 

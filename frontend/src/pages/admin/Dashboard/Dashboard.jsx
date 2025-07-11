@@ -1,56 +1,26 @@
-// import { Col, Row } from 'antd'
-// import React from 'react'
-
-// import AdminSlider from './components/AdminSlider'
-// import CategorySlider from './components/CategorySlider'
-// import SubCategorySlider from './components/SubCategorySlider';
-// import StaticsData from './components/StaticsData';
-
-// function Dashboard() {
-//     return (
-//         <>
-//             <Row gutter={[16, 16]}>
-//                 <Col xs={24} sm={24} md={15}>
-//                     <AdminSlider />
-//                     <CategorySlider />
-//                     <SubCategorySlider />
-//                 </Col>
-//                 <Col xs={24} sm={24} md={9}>
-//                     <StaticsData />
-//                 </Col>
-//             </Row>
-//         </>
-//     )
-// }
-
-// export default Dashboard
-
 import { Col, Row, Spin } from 'antd'
 import React, { useEffect, useState } from 'react'
-import AdminSlider from './components/AdminSlider'
-import CategorySlider from './components/CategorySlider'
-import SubCategorySlider from './components/SubCategorySlider'
 import StaticsData from './components/StaticsData'
-import DashboardCharts from './components/DashboardCharts'
-import RecentOrders from './components/RecentOrders'
-import PendingApprovals from './components/PendingApprovals'
-import QuickStats from './components/QuickStats'
-import { getDashboard } from '../../../services/admin/apiDashboard'
-import MonthlySalesChart from './components/MonthlySalesChart'
-import ServiceWiseSalesChart from './components/ServiceWiseSalesChart'
-import ServiceWiseVendorChart from './components/ServiceWiseVendorChart copy'
+import { getDashboard, getNewUser, getRecentTransaction } from '../../../services/admin/apiDashboard'
+import SalesGraph from './components/SalesGraph';
+import UserStatus from './components/UserStatus';
+import RecentTransactions from './components/RecentTransactions';
+import NewUserList from './components/NewUserList';
 
 function Dashboard() {
 
     const [data, setData] = useState(null);
+    const [recentData, setRecentData] = useState(null)
+    const [newUser, setNewUser] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [recentLoading, setRecentLoading] = useState(true)
+    const [newUserLoading, setNewUserLoading] = useState(true)
 
-    useEffect(() => { fetchDashboard() }, [])
+    useEffect(() => { fetchDashboard(), fetchRecentTransaction(), fetchNewUser() }, []);
 
     const fetchDashboard = async () => {
         try {
             const res = await getDashboard();
-            // console.log(res)
             setData(res)
         } catch (error) {
             message.error('Error fetching dashboard data');
@@ -58,6 +28,27 @@ function Dashboard() {
             setLoading(false)
         }
     }
+    const fetchRecentTransaction = async () => {
+        try {
+            const res = await getRecentTransaction();
+            setRecentData(res);
+        } catch (error) {
+            console.error('Error fetching dashboard data');
+        } finally {
+            setRecentLoading(false);
+        }
+    };
+
+    const fetchNewUser = async () => {
+        try {
+            const res = await getNewUser();
+            setNewUser(res);
+        } catch (error) {
+            console.error('Error fetching user data');
+        } finally {
+            setNewUserLoading(false);
+        }
+    };
 
     // if (loading) return <Spin size='large' fullscreen />
 
@@ -65,32 +56,22 @@ function Dashboard() {
         <div className="p-4">
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={24} md={24} lg={24}>
-                    {/* <AdminSlider /> */}
-                    {/* <StaticsData data={data.countData} loading={loading}/> */}
                     {data ? <StaticsData data={data.countData} loading={loading} /> : <Spin size='large' />}
                 </Col>
-
-                {/* <Col xs={24} sm={24} md={24} lg={8}>
-                    <PendingApprovals />
-                    <CategorySlider data={data.categoryWithProduct} />
-                    <SubCategorySlider data={data.subCategoryWithProduct} />
+                <Col xs={24} sm={12} md={12} lg={12}>
+                    <SalesGraph data={data?.salesGraph} />
+                </Col>
+                {/* <Col xs={24} sm={12} md={12} lg={12}>
+                    <UserStatus data={data?.userStatus} />
                 </Col> */}
-
+                <Col xs={24} sm={12} md={12} lg={12}>
+                    <NewUserList data={newUser} loading={newUserLoading} />
+                </Col>
+                <Col xs={24} sm={12} md={12} lg={12}>
+                    <RecentTransactions data={recentData} loading={recentLoading} />
+                </Col>
+                
             </Row>
-            <MonthlySalesChart />
-            {/* <Row gutter={[16, 16]}>
-                <Col xs={24} sm={24} md={24} lg={16}>
-                    <MonthlySalesChart />
-                </Col>
-                <Col xs={24} sm={24} md={24} lg={8}>
-                    <ServiceWiseSalesChart />
-                </Col>
-            </Row> */}
-            {/* <Row gutter={[16, 16]}>
-                <Col xs={24} sm={24} md={24} lg={8}>
-                    <ServiceWiseVendorChart />
-                </Col>
-            </Row> */}
         </div>
     )
 }

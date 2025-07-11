@@ -28,7 +28,6 @@ export const getAllProducts = async (type) => {
     }
 }
 
-
 export const getProductDetail = async (id) => {
     try {
         const response = await axiosInstance.get(`/api/admin/product/${id}`);

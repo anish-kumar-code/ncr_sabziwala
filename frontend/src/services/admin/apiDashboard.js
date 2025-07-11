@@ -9,3 +9,17 @@ export const getDashboard = async () => {
         message.error('Error fetching dashboard data');
     }
 }
+
+
+
+export const getRecentTransaction = async () => {
+    const response = await axiosInstance.get(`/api/admin/recent-transactions`);
+    return response.data.data;
+}
+
+
+
+export const getNewUser = async () => {
+    const response = await axiosInstance.get(`/api/admin/new-users`);
+    return response.data.data;
+}

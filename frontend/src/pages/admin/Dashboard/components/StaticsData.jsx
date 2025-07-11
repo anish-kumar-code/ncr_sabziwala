@@ -16,11 +16,8 @@ function StaticsData({ data, loading }) {
         { name: "Banner", icon: <RiAdvertisementLine />, count: data.banner || 10, color: "#6366f1" },
         { name: "Category", icon: <RiFolderLine />, count: data.category, color: "#10b981" },
         { name: "Sub Category", icon: <RiStackLine />, count: data.subCategory, color: "#f59e0b" },
-        // { name: "Food", icon: <RiRestaurantLine />, count: data.food, color: "#ef4444" },
-        // { name: "Grocery", icon: <RiShoppingBasketLine />, count: data.grocery, color: "#8b5cf6" },
-        // { name: "Vendor", icon: <RiStoreLine />, count: data.vendor, color: "#3b82f6" },
+        { name: "Product", icon: <RiStoreLine />, count: data.products || 3, color: "#3b82f6" },
         { name: "Total Order", icon: <RiStoreLine />, count: data.order || 10, color: "#3b82f6" },
-        { name: "Driver", icon: <RiStoreLine />, count: data.drivers || 3, color: "#3b82f6" },
         { name: "User", icon: <RiUserLine />, count: data.user || 100, color: "#ec4899" },
     ];
 

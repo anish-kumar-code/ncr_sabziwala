@@ -11,9 +11,6 @@ import Banner from './pages/admin/Banner/Banner'
 import Category from './pages/admin/Category/Category'
 import SubCategory from './pages/admin/SubCategory/SubCategory'
 import Product from './pages/admin/Products/Product'
-import Vendor from './pages/admin/Vendor/Vendor'
-import VendorDetails from './pages/admin/Vendor/components/VendorDetails'
-import VendorProducts from './pages/admin/Vendor/components/VendorProducts'
 import Shop from './pages/admin/Shop/Shop'
 import User from './pages/admin/User/User'
 import Settings from './pages/admin/Settings/Settings'
@@ -34,7 +31,6 @@ import Driver from "./pages/admin/Driver/Driver"
 import ProductFlags from './pages/admin/ProductFlags/ProductFlags'
 import Explore from './pages/admin/Explore/Explore'
 import ExploreSection from './pages/admin/ExploreSection/ExploreSection'
-import Store199 from './pages/admin/Store199/Store199'
 import ExploreSectionTable from './pages/admin/Explore/components/ExploreSectionTable'
 import AddProduct from './pages/admin/Products/AddProduct'
 
@@ -60,12 +56,8 @@ function App() {
           <Route path='sub-category' element={<SubCategory />} />
           <Route path='coupon' element={<Coupon />} />
           <Route path='driver' element={<Driver />} />
-          <Route path='vendor' element={<Vendor />} />
-          <Route path='vendor/:id' element={<VendorDetails />} />
-          <Route path='vendor/shops/:id' element={<VendorProducts />} />
           <Route path='products/:produtSlug' element={<ProductDetails />} />
           <Route path='product-flags' element={<ProductFlags />} />
-          {/* <Route path='store199' element={<Store199 />} /> */}
           <Route path='shop' element={<Shop />} />
           <Route path='order' element={<Order />} />
           <Route path="order/:orderId" element={<OrderDetailsPage />} />
